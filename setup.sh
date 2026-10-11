@@ -17,6 +17,11 @@ echo "Copying dots"
 cp -r $REPO_DIR/.config ~/.config
 cp $REPO_DIR/.bashrc ~/.bashrc
 mkdir -p ~/Pictures/Screenshots
+mkdir -p ~/Documents
+mkdir -p ~/Videos
+mkdir -p ~/Downloads
+mkdir -p ~/Music
+
 
 echo "Setting up symlink"
 sudo cp "$REPO_DIR/etc/tlp.d/00-custom.conf" /etc/tlp.d/00-custom.conf
