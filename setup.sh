@@ -5,7 +5,7 @@ set -euo pipefail
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 echo "Installing deps"
-sudo pacman -S --needed --noconfirm git base-devel tlp nwg-displays hyprland kitty blueman
+sudo pacman -S --needed --noconfirm git base-devel tlp nwg-displays hyprland kitty blueman brightnessctl pipewire pipewire-pulse wireplumber pavucontrol
 
 echo "Copying dots"
 cp -r $REPO_DIR/.config ~/.config
