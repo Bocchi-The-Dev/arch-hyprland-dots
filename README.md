@@ -1,0 +1,1 @@
+Basic Arch + Hyprland config for the ASUS Vivobook E210MAB
