@@ -23,7 +23,7 @@ mkdir -p ~/Downloads
 mkdir -p ~/Music
 
 
-echo "Setting up symlink"
+echo "Copying TLP Config."
 sudo cp "$REPO_DIR/etc/tlp.d/00-custom.conf" /etc/tlp.d/00-custom.conf
 
 echo "Enabling and starting TLP"
