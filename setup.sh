@@ -8,12 +8,15 @@ echo "Updating System"
 sudo pacman -Syu --needed --noconfirm 
 
 echo "Installing deps"
-sudo pacman -S --needed --noconfirm git base-devel tlp nwg-displays hyprland kitty blueman brightnessctl pipewire pipewire-pulse wireplumber pavucontrol nwg-look ttf-jetbrains-mono-nerd wofi polkit-kde-agent hyprpaper dunst dolphin xdg-desktop-portal-hyprland waybar wl-copy 
+sudo pacman -S --needed --noconfirm git base-devel tlp nwg-displays hyprland kitty blueman brightnessctl pipewire pipewire-pulse wireplumber pavucontrol nwg-look ttf-jetbrains-mono-nerd wofi polkit-kde-agent hyprpaper dunst dolphin xdg-desktop-portal-hyprland waybar wl-copy grim slurp swappy 
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmybash/oh-my-bash/master/tools/install.sh)"
+sudo pacman -S --needed git base-devel && git clone https://aur.archlinux.org/yay-bin.git && cd yay-bin && makepkg -si
+yay -S -needed -noconfirm grimblast-git
 
 echo "Copying dots"
 cp -r $REPO_DIR/.config ~/.config
 cp $REPO_DIR/.bashrc ~/.bashrc
+mkdir -p ~/Pictures/Screenshots
 
 echo "Setting up symlink"
 sudo cp "$REPO_DIR/etc/tlp.d/00-custom.conf" /etc/tlp.d/00-custom.conf
