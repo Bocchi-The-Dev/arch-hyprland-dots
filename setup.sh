@@ -5,10 +5,13 @@ set -euo pipefail
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 echo "Installing deps"
-sudo pacman -S --needed --noconfirm git base-devel tlp
+sudo pacman -S --needed --noconfirm git base-devel tlp nwg-displays hyprland kitty blueman
+
+echo "Copying dots"
+cp -r $REPO_DIR/.config ~/.config
 
 echo "Setting up symlink"
-sudo ln -sf "$REPO_DIR/etc/tlp.d/00-custom.conf" /etc/tlp.d/00-custom.conf
+sudo cp "$REPO_DIR/etc/tlp.d/00-custom.conf" /etc/tlp.d/00-custom.conf
 
 echo "Enabling and starting TLP"
 sudo systemctl enable --now tlp.service
