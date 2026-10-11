@@ -18,3 +18,4 @@ on such a low-end device
 - Super + C To close apps.
 - Super + Click and Drag with mouse to move Windows with the mouse.
 - Super + Arrow Keys to Switch which Tiled window is focused.
+- Super + V Fullscreen focused app
