@@ -7,12 +7,12 @@ on such a low-end device
 - It will install some dependencies.
 - It will NOT work on other distros except arch or arch based.
 - The power config it copies is for the ASUS VIVO-BOOK E210MAB laptop.
-- It will NOT reboot your system automatically.
+- It WILL reboot your system automatically after 15 seconds!.
 
 ## Notes on the dots themselves
 - They are VERY basic as to not take up to much resources,
-- It's mainly optimised for 1080P.
-- It's VERY close to stock hyprland. using Stock wallpapers.
+- It's mainly optimised for 1080P and 720P.
+- It's VERY close to stock hyprland. using Custom wallpapers.
 - Very lightly configured waybar.
 - Super + Q For Kitty.
 - Super + C To close apps.
