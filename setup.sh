@@ -21,6 +21,7 @@ mkdir -p ~/Documents
 mkdir -p ~/Videos
 mkdir -p ~/Downloads
 mkdir -p ~/Music
+cp -r $REPO_DIR/wallpapers/ ~/Pictures/
 
 
 echo "Copying TLP Config."
