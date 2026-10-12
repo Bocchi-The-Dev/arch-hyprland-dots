@@ -30,4 +30,6 @@ sudo cp "$REPO_DIR/etc/tlp.d/00-custom.conf" /etc/tlp.d/00-custom.conf
 echo "Enabling and starting TLP"
 sudo systemctl enable --now tlp.service
 
-echo "Done. You should reboot your system now."
+echo "Done. Rebooting your system in 15 seconds"
+sleep 15
+reboot 
