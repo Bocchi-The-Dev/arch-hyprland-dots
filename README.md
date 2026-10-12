@@ -19,3 +19,9 @@ on such a low-end device
 - Super + Click and Drag with mouse to move Windows with the mouse.
 - Super + Arrow Keys to Switch which Tiled window is focused.
 - Super + V Fullscreen focused app
+
+## Screenshots
+<img width="1366" height="768" alt="20261012_192207" src="https://github.com/user-attachments/assets/ce73cb53-275c-4296-9646-6d836e4792ef" />
+<img width="1366" height="768" alt="20261012_192218" src="https://github.com/user-attachments/assets/dac65a26-27d0-417a-b3f3-77c8814c5a2d" />
+<img width="1366" height="768" alt="20261012_192227" src="https://github.com/user-attachments/assets/34c7d4c5-0cba-4e39-86a8-520983920dee" />
+
