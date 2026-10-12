@@ -6,7 +6,7 @@ on such a low-end device
 - It will perform a full system update.
 - It will install some dependencies.
 - It will NOT work on other distros except arch or arch based.
-- The power config it copies is for the ASUS VIVO-BOOK E210MAB laptop.
+- The power coenfig it ceopies is for the ASUS VIVO-BOOK E210MAB laptop.
 - It WILL reboot your system automatically after 15 seconds!.
 
 ## Notes on the dots themselves
@@ -19,6 +19,10 @@ on such a low-end device
 - Super + Click and Drag with mouse to move Windows with the mouse.
 - Super + Arrow Keys to Switch which Tiled window is focused.
 - Super + V Fullscreen focused app
+
+## Credits
+Kitty theme: [Catppuccin Macchiato](https://github.com/catppuccin/kitty) (MIT)
+Wallpaper from [D3Ext/aesthetic-wallpapers](https://github.com/D3Ext/aesthetic-wallpapers)
 
 ## Screenshots
 <img width="1366" height="768" alt="20261012_192207" src="https://github.com/user-attachments/assets/ce73cb53-275c-4296-9646-6d836e4792ef" />
