@@ -29,6 +29,10 @@ hl.monitor({
     scale    = "auto",
 })
 
+-- Clamshell mode: disable the laptop panel on lid close (event-driven, no polling).
+-- Must be required after the monitor rules above.
+require("lid")
+
 
 ---------------------
 ---- MY PROGRAMS ----
@@ -52,6 +56,7 @@ hl.on("hyprland.start", function()
     hl.exec_cmd("nm-applet")
     hl.exec_cmd("waybar")
     hl.exec_cmd("hyprpaper")
+    hl.exec_cmd("ksecretd") -- Secret Service backend for git credential.helper=libsecret (KWallet)
 end)
 -------------------------------
 ---- ENVIRONMENT VARIABLES ----

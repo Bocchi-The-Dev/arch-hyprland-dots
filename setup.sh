@@ -23,7 +23,7 @@ echo "Updating System"
 sudo pacman -Syu --needed --noconfirm 
 
 echo "Installing deps"
-sudo pacman -S --needed --noconfirm git base-devel tlp nwg-displays hyprland kitty blueman brightnessctl pipewire pipewire-pulse wireplumber pavucontrol nwg-look ttf-jetbrains-mono-nerd wofi polkit-kde-agent hyprpaper dunst thunar xdg-desktop-portal-hyprland waybar wl-copy grim slurp swappy mpv yt-dlp keyd
+sudo pacman -S --needed --noconfirm git base-devel tlp hyprland kitty blueman brightnessctl pipewire pipewire-pulse wireplumber pavucontrol nwg-look ttf-jetbrains-mono-nerd wofi polkit-kde-agent hyprpaper dunst thunar xdg-desktop-portal-hyprland waybar wl-copy grim slurp swappy mpv yt-dlp keyd
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmybash/oh-my-bash/master/tools/install.sh)"
 sudo pacman -S --needed git base-devel && git clone https://aur.archlinux.org/yay-bin.git && cd yay-bin && makepkg -si
 yay -S -needed -noconfirm grimblast-git
