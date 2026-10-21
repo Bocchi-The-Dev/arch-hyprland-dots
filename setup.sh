@@ -19,16 +19,37 @@ set -euo pipefail
 # Repo root = directory containing this script (works even if not at ~/dotfiles)
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# The user running this (not root), for group membership the script needs.
+TARGET_USER="${SUDO_USER:-$USER}"
+
 # Everything installed here is COPIED, never symlinked back into $REPO_DIR,
 # so the clone can be deleted after the script finishes.
 echo "Updating System"
 sudo pacman -Syu --needed --noconfirm 
 
 echo "Installing deps"
-sudo pacman -S --needed --noconfirm git base-devel tlp hyprland kitty networkmanager iwd brightnessctl pipewire pipewire-pulse wireplumber rtkit pavucontrol nwg-look ttf-jetbrains-mono-nerd wofi hyprpolkitagent hyprpaper dunst thunar xdg-desktop-portal-hyprland waybar wl-copy grim slurp swappy mpv yt-dlp keyd dosfstools accountsservice wireless-regdb qt5ct xed peazip avahi nftables
+sudo pacman -S --needed --noconfirm \
+	base base-devel git sudo less bash-completion \
+	linux linux-firmware intel-ucode mkinitcpio efibootmgr btrfs-progs dosfstools \
+	intel-media-driver libva-intel-driver vulkan-intel libvpl vpl-gpu-rt \
+	hyprland uwsm lightdm lightdm-gtk-greeter seatd hyprpaper hyprpolkitagent \
+	waybar dunst kitty wofi thunar nwg-look brightnessctl accountsservice \
+	xdg-desktop-portal-hyprland xdg-utils qt5ct qt5-wayland qt6-wayland \
+	keyd grim slurp swappy wl-clipboard mpv yt-dlp xed peazip \
+	pipewire pipewire-pulse wireplumber rtkit pavucontrol \
+	ttf-jetbrains-mono-nerd \
+	networkmanager network-manager-applet iwd wireless-regdb avahi nftables \
+	tlp zram-generator \
+	firefox github-cli htop fastfetch nano vim rsync unzip unrar pv wget \
+	smartmontools android-tools android-udev scrcpy torbrowser-launcher \
+	proton-vpn-gtk-app ksshaskpass x11-ssh-askpass libsrtp xorg-xhost
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmybash/oh-my-bash/master/tools/install.sh)"
 sudo pacman -S --needed git base-devel && git clone https://aur.archlinux.org/yay-bin.git && cd yay-bin && makepkg -si
-yay -S --needed --noconfirm grimblast-git
+yay -S --needed --noconfirm grimblast-git ayugram-desktop
+
+echo "Adding $TARGET_USER to seat/input/wheel"
+# seatd and libinput need these; wheel is needed for sudo.
+sudo usermod -aG seat,input,wheel "$TARGET_USER"
 
 echo "Copying dots"
 # -T so re-runs merge into ~/.config instead of creating ~/.config/.config
@@ -54,7 +75,24 @@ while IFS= read -r -d '' src; do
 	sudo install -Dm644 "$src" "$dst"
 done < <(find "$REPO_DIR/etc" -type f -print0)
 
+echo "Generating kernel cmdline"
+# /etc/kernel/cmdline is machine-specific (root PARTUUID), so it is generated
+# rather than stored in the repo. The two non-default flags are the point:
+# zswap off (zram is used instead) and pm_debug_messages (crash diagnostics).
+ROOT_PARTUUID="$(findmnt -no PARTUUID /)"
+ROOT_SUBVOL="$(findmnt -no FSROOT /)"; ROOT_SUBVOL="${ROOT_SUBVOL#/}"
+ROOT_FSTYPE="$(findmnt -no FSTYPE /)"
+printf 'root=PARTUUID=%s zswap.enabled=0 rootflags=subvol=%s rw rootfstype=%s pm_debug_messages\n' \
+	"$ROOT_PARTUUID" "$ROOT_SUBVOL" "$ROOT_FSTYPE" | sudo tee /etc/kernel/cmdline >/dev/null
+
 sudo sysctl --system >/dev/null
+
+echo "Masking services that must not run"
+# TLP replaces power-profiles-daemon; iwd replaces wpa_supplicant.
+sudo systemctl mask power-profiles-daemon.service wpa_supplicant.service
+# This firmware TPM exposes no NvPCR NV indices, so these otherwise fail on
+# every boot. Nothing here uses TPM-sealed policies, so masking is safe.
+sudo systemctl mask systemd-tpm2-setup-early.service systemd-pcrproduct.service 'systemd-pcrlogin@.service'
 
 echo "Enabling and starting TLP"
 sudo systemctl enable --now tlp.service
@@ -72,6 +110,14 @@ sudo ln -sfn /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
 
 echo "Enabling mDNS (Avahi)"
 sudo systemctl enable --now avahi-daemon.service
+
+echo "Enabling keyd, seatd and the display manager"
+sudo systemctl enable --now keyd.service
+sudo systemctl enable --now seatd.service
+sudo systemctl enable lightdm.service
+
+echo "Enabling Proton VPN daemon"
+sudo systemctl enable --now proton.VPN.service
 
 echo "Disabling Bluetooth"
 # Not used on this machine. Re-enable with: systemctl enable --now bluetooth
@@ -101,10 +147,9 @@ if [ -n "$BOOT_DEV" ]; then
 	sudo mount /boot
 fi
 
-echo "Silencing TPM NvPCR services"
-# This firmware TPM exposes no NvPCR NV indices, so these otherwise fail on
-# every boot. Nothing here uses TPM-sealed policies, so masking is safe.
-sudo systemctl mask systemd-tpm2-setup-early.service systemd-pcrproduct.service 'systemd-pcrlogin@.service'
+echo "Rebuilding the unified kernel image"
+# Picks up the generated /etc/kernel/cmdline and etc/mkinitcpio.d/linux.preset.
+sudo mkinitcpio -P
 
 echo "Done. Rebooting your system in 15 seconds"
 sleep 15

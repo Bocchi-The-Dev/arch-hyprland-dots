@@ -49,6 +49,31 @@ Extra notes:
   (`802-11-wireless.band bg`) and its DNS server (`ipv4.dns 1.1.1.1`).
 - Bluetooth is installed-less/disabled by choice; re-enable with `systemctl enable --now bluetooth`.
 
+## System config
+
+`setup.sh` copies the `etc/` tree into `/etc`. Tracked here:
+
+| Path | Purpose |
+|---|---|
+| `etc/keyd/default.conf` | Left Ctrl disabled, Caps Lock acts as Ctrl |
+| `etc/X11/xorg.conf.d/00-keyboard.conf` | GB keyboard layout for X11/greeter |
+| `etc/vconsole.conf`, `etc/locale.conf` | console keymap `uk`, locale `en_US.UTF-8` |
+| `etc/systemd/zram-generator.conf` | zram swap, zstd |
+| `etc/sysctl.d/90-freeze-capture.conf` | hung-task warning at 30s instead of 120s |
+| `etc/systemd/journald.conf.d/00-freeze-capture.conf` | flush journal every 5s so a hard freeze keeps its last seconds |
+| `etc/mkinitcpio.d/linux.preset` | builds a unified kernel image (UKI) at `/boot/EFI/Linux/arch-linux.efi` |
+| `etc/nftables.conf` | host firewall (see Networking) |
+| `etc/tlp.d/*`, `etc/sysctl.d/9*.conf`, `etc/modprobe.d/*` | power, TCP and RTL8821CE tuning |
+| `etc/NetworkManager/*`, `etc/iwd/main.conf`, `etc/systemd/resolved.conf.d/*` | network stack (see Networking) |
+
+Deliberately **not** tracked:
+
+- `/etc/kernel/cmdline` — contains the root PARTUUID, so `setup.sh` generates it from `findmnt`.
+- `/etc/fstab`, `/etc/hostname` — machine/disk specific.
+- `/etc/pacman.conf` — package-manager state, not a dotfile. Note `extra-testing` must stay
+  disabled; it was only ever needed to pull `proton-vpn-gtk-app` early.
+- App state under `~/.config` (browsers, `gh`, `yay`, …) — runtime data, not config.
+
 ## Credits
 Kitty theme: [Catppuccin Macchiato](https://github.com/catppuccin/kitty) (MIT)
 Wallpaper from [D3Ext/aesthetic-wallpapers](https://github.com/D3Ext/aesthetic-wallpapers)

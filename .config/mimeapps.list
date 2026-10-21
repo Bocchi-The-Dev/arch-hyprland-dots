@@ -1,0 +1,9 @@
+[Default Applications]
+x-scheme-handler/tg=userapp-AyuGram Desktop-K88MX3.desktop
+x-scheme-handler/tonsite=userapp-AyuGram Desktop-744MX3.desktop
+application/x-zerosize=code-oss.desktop
+
+[Added Associations]
+x-scheme-handler/tg=userapp-AyuGram Desktop-S0XWW3.desktop;userapp-AyuGram Desktop-K88MX3.desktop;
+x-scheme-handler/tonsite=userapp-AyuGram Desktop-ZY8WW3.desktop;userapp-AyuGram Desktop-744MX3.desktop;
+application/x-zerosize=code-oss.desktop;
