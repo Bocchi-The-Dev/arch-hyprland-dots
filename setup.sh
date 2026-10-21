@@ -19,17 +19,20 @@ set -euo pipefail
 # Repo root = directory containing this script (works even if not at ~/dotfiles)
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# Everything installed here is COPIED, never symlinked back into $REPO_DIR,
+# so the clone can be deleted after the script finishes.
 echo "Updating System"
 sudo pacman -Syu --needed --noconfirm 
 
 echo "Installing deps"
-sudo pacman -S --needed --noconfirm git base-devel tlp hyprland kitty blueman bluez bluez-utils brightnessctl pipewire pipewire-pulse wireplumber rtkit pavucontrol nwg-look ttf-jetbrains-mono-nerd wofi polkit-kde-agent hyprpaper dunst thunar xdg-desktop-portal-hyprland waybar wl-copy grim slurp swappy mpv yt-dlp keyd dosfstools accountsservice wireless-regdb qt5ct xed peazip
+sudo pacman -S --needed --noconfirm git base-devel tlp hyprland kitty networkmanager iwd brightnessctl pipewire pipewire-pulse wireplumber rtkit pavucontrol nwg-look ttf-jetbrains-mono-nerd wofi hyprpolkitagent hyprpaper dunst thunar xdg-desktop-portal-hyprland waybar wl-copy grim slurp swappy mpv yt-dlp keyd dosfstools accountsservice wireless-regdb qt5ct xed peazip avahi nftables
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmybash/oh-my-bash/master/tools/install.sh)"
 sudo pacman -S --needed git base-devel && git clone https://aur.archlinux.org/yay-bin.git && cd yay-bin && makepkg -si
 yay -S --needed --noconfirm grimblast-git
 
 echo "Copying dots"
-cp -r $REPO_DIR/.config ~/.config
+# -T so re-runs merge into ~/.config instead of creating ~/.config/.config
+cp -rT $REPO_DIR/.config ~/.config
 cp $REPO_DIR/.bashrc ~/.bashrc
 mkdir -p ~/Pictures/Screenshots
 mkdir -p ~/Documents
@@ -39,14 +42,54 @@ mkdir -p ~/Music
 cp -r $REPO_DIR/wallpapers/ ~/Pictures/
 
 
-echo "Copying TLP Config."
-sudo cp "$REPO_DIR/etc/tlp.d/00-custom.conf" /etc/tlp.d/00-custom.conf
+echo "Copying system config"
+# Mirrors the repo's etc/ tree into /etc (e.g. etc/tlp.d/x.conf ->
+# /etc/tlp.d/x.conf). Copies only, so nothing points back at the clone.
+while IFS= read -r -d '' src; do
+	rel="${src#$REPO_DIR/etc/}"
+	dst="/etc/$rel"
+	if [ "$(readlink -f "$src")" = "$(readlink -f "$dst" 2>/dev/null || true)" ]; then
+		continue
+	fi
+	sudo install -Dm644 "$src" "$dst"
+done < <(find "$REPO_DIR/etc" -type f -print0)
+
+sudo sysctl --system >/dev/null
 
 echo "Enabling and starting TLP"
 sudo systemctl enable --now tlp.service
 
-echo "Enabling and starting Bluetooth"
-sudo systemctl enable --now bluetooth.service
+echo "Enabling the firewall"
+# /etc/nftables.conf is the ruleset from etc/: deny inbound, allow replies,
+# DHCP, mDNS and ICMP.
+sudo systemctl enable --now nftables.service
+
+echo "Enabling systemd-resolved"
+# NetworkManager is configured (etc/NetworkManager/conf.d/20-dns-resolved.conf)
+# to hand DNS to resolved, which needs /etc/resolv.conf pointing at the stub.
+sudo systemctl enable --now systemd-resolved.service
+sudo ln -sfn /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
+
+echo "Enabling mDNS (Avahi)"
+sudo systemctl enable --now avahi-daemon.service
+
+echo "Disabling Bluetooth"
+# Not used on this machine. Re-enable with: systemctl enable --now bluetooth
+sudo systemctl disable --now bluetooth.service 2>/dev/null || true
+
+echo "Disabling NetworkManager-wait-online"
+# Avoids a boot delay when no network is available yet.
+sudo systemctl disable NetworkManager-wait-online.service 2>/dev/null || true
+
+echo "Restarting NetworkManager"
+sudo systemctl restart NetworkManager.service
+
+# NOTE: two settings are per-network and cannot be shipped generically (they
+# also must not carry the WiFi PSK):
+#   nmcli con modify "<ssid>" 802-11-wireless.band bg      # weak 5GHz avoidance
+#   nmcli con modify "<ssid>" ipv4.dns 1.1.1.1
+# MAC randomisation and WiFi powersave are global defaults, set in
+# etc/NetworkManager/conf.d/10-wifi-privacy.conf and etc/iwd/main.conf.
 
 echo "Checking the /boot (ESP) filesystem"
 # dosfstools provides fsck.fat, which lets systemd check the FAT ESP at boot.

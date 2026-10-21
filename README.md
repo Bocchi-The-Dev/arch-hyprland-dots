@@ -20,6 +20,35 @@ on such a low-end device
 - Super + Arrow Keys to Switch which Tiled window is focused.
 - Super + V Fullscreen focused app
 
+## Networking
+
+The network stack is deliberately boring: one manager, one supplicant, one resolver.
+
+| Layer | What | Where it is set |
+|---|---|---|
+| Manager | NetworkManager | system |
+| WiFi backend | iwd (`wpa_supplicant` stays masked) | `etc/NetworkManager/conf.d/wifi_backend.conf` |
+| DHCP | NetworkManager internal (iwd does not do addressing) | `etc/iwd/main.conf` |
+| Resolver | systemd-resolved, upstream 1.1.1.1 | `etc/systemd/resolved.conf.d/50-dns.conf` |
+| Firewall | nftables, deny inbound; allows replies, DHCP, mDNS, ICMP | `etc/nftables.conf` |
+| mDNS | Avahi | enabled by `setup.sh` |
+| Power | TLP + no WiFi powersave | `etc/tlp.d/50-wifi-perf.conf` |
+| TCP | BBR + fq | `etc/sysctl.d/99-network-tune.conf` |
+
+Extra notes:
+
+- `setup.sh` copies everything from `etc/` into `/etc`, so the clone can be deleted afterwards.
+- MAC randomisation is a stable per-network random MAC. It is set in `etc/iwd/main.conf`
+  (`AddressRandomization=network`) because NetworkManager's iwd backend ignores its own
+  `cloned-mac-address` setting.
+- WiFi powersave is disabled in three places on purpose: NetworkManager's default
+  (`wifi.powersave=2`), iwd's deep power state (`disable_lps_deep=1`) and TLP. With any of
+  them on, the RTL8821CE on this laptop parks the radio and the link collapses to MCS0.
+- Two settings are per-network and are **not** in the repo because they are machine/SSID
+  specific (and one would need the WiFi password): pinning a weak-signal network to 2.4 GHz
+  (`802-11-wireless.band bg`) and its DNS server (`ipv4.dns 1.1.1.1`).
+- Bluetooth is installed-less/disabled by choice; re-enable with `systemctl enable --now bluetooth`.
+
 ## Credits
 Kitty theme: [Catppuccin Macchiato](https://github.com/catppuccin/kitty) (MIT)
 Wallpaper from [D3Ext/aesthetic-wallpapers](https://github.com/D3Ext/aesthetic-wallpapers)

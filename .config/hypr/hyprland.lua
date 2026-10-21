@@ -54,6 +54,9 @@ local menu = "wofi --show drun"
 -- Or execute your favorite apps at launch like this:
 hl.on("hyprland.start", function()
     hl.exec_cmd("nm-applet")
+    -- polkit agent: needed for auth prompts (nm-connection-editor, pkexec, etc.)
+    -- Without it, privileged operations fail silently.
+    hl.exec_cmd("systemctl --user start hyprpolkitagent")
     hl.exec_cmd("waybar")
     hl.exec_cmd("hyprpaper")
     hl.exec_cmd("ksecretd") -- Secret Service backend for git credential.helper=libsecret (KWallet)
