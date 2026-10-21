@@ -39,7 +39,7 @@ sudo pacman -S --needed --noconfirm \
 	pipewire pipewire-pulse wireplumber rtkit pavucontrol \
 	ttf-jetbrains-mono-nerd \
 	networkmanager network-manager-applet iwd wireless-regdb avahi nftables \
-	tlp zram-generator \
+	tlp zram-generator fwupd reflector \
 	firefox github-cli htop fastfetch nano vim rsync unzip unrar pv wget \
 	smartmontools android-tools android-udev scrcpy torbrowser-launcher \
 	proton-vpn-gtk-app ksshaskpass x11-ssh-askpass libsrtp xorg-xhost
@@ -74,6 +74,8 @@ while IFS= read -r -d '' src; do
 	fi
 	sudo install -Dm644 "$src" "$dst"
 done < <(find "$REPO_DIR/etc" -type f -print0)
+# fwupd ships its config 0640 root:root; the generic loop installs 0644.
+sudo chmod 640 /etc/fwupd/fwupd.conf
 
 echo "Generating kernel cmdline"
 # /etc/kernel/cmdline is machine-specific (root PARTUUID), so it is generated
@@ -110,6 +112,14 @@ sudo ln -sfn /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
 
 echo "Enabling mDNS (Avahi)"
 sudo systemctl enable --now avahi-daemon.service
+
+echo "Enabling firmware and mirror maintenance"
+# fwupd-refresh only downloads LVFS metadata; fwupd itself is D-Bus activated.
+sudo systemctl enable --now fwupd-refresh.timer
+# Weekly mirrorlist refresh using etc/xdg/reflector/reflector.conf (GB, IPv4,
+# HTTPS). Run it once now so the first pacman sync uses local mirrors.
+sudo systemctl enable --now reflector.timer
+sudo systemctl start reflector.service || echo "warning: reflector failed; keeping the existing mirrorlist"
 
 echo "Enabling keyd, seatd and the display manager"
 sudo systemctl enable --now keyd.service

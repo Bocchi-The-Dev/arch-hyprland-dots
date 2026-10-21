@@ -65,6 +65,8 @@ Extra notes:
 | `etc/nftables.conf` | host firewall (see Networking) |
 | `etc/tlp.d/*`, `etc/sysctl.d/9*.conf`, `etc/modprobe.d/*` | power, TCP and RTL8821CE tuning |
 | `etc/NetworkManager/*`, `etc/iwd/main.conf`, `etc/systemd/resolved.conf.d/*` | network stack (see Networking) |
+| `etc/xdg/reflector/reflector.conf` | weekly `reflector.timer` refresh: GB, HTTPS, IPv4-only mirrors |
+| `etc/fwupd/fwupd.conf` | no MOTD nag; check with `fwupdmgr get-updates` (`fwupd-refresh.timer` enabled) |
 
 Deliberately **not** tracked:
 
