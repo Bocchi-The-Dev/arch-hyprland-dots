@@ -60,6 +60,7 @@ hl.on("hyprland.start", function()
     hl.exec_cmd("waybar")
     hl.exec_cmd("hyprpaper")
     hl.exec_cmd("ksecretd") -- Secret Service backend for git credential.helper=libsecret (KWallet)
+    hl.exec_cmd("udiskie --tray")
 end)
 -------------------------------
 ---- ENVIRONMENT VARIABLES ----
