@@ -41,8 +41,8 @@ sudo pacman -S --needed --noconfirm \
 	networkmanager network-manager-applet iwd wireless-regdb avahi nftables \
 	tlp zram-generator fwupd reflector \
 	firefox github-cli htop fastfetch nano vim rsync unzip unrar pv wget \
-	smartmontools android-tools android-udev scrcpy torbrowser-launcher \
-	proton-vpn-gtk-app ksshaskpass x11-ssh-askpass libsrtp xorg-xhost
+	smartmontools android-tools android-udev noto-fonts-cjk \
+	ksshaskpass x11-ssh-askpass libsrtp xorg-xhost
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmybash/oh-my-bash/master/tools/install.sh)"
 sudo pacman -S --needed git base-devel && git clone https://aur.archlinux.org/yay-bin.git && cd yay-bin && makepkg -si
 yay -S --needed --noconfirm grimblast-git ayugram-desktop
