@@ -126,9 +126,6 @@ sudo systemctl enable --now keyd.service
 sudo systemctl enable --now seatd.service
 sudo systemctl enable lightdm.service
 
-echo "Enabling Proton VPN daemon"
-sudo systemctl enable --now proton.VPN.service
-
 echo "Disabling Bluetooth"
 # Not used on this machine. Re-enable with: systemctl enable --now bluetooth
 sudo systemctl disable --now bluetooth.service 2>/dev/null || true
@@ -160,6 +157,22 @@ fi
 echo "Rebuilding the unified kernel image"
 # Picks up the generated /etc/kernel/cmdline and etc/mkinitcpio.d/linux.preset.
 sudo mkinitcpio -P
+
+sudo install -m 755 bustd /usr/local/bin/bustd
+sudo tee /etc/systemd/system/bustd.service <<'EOF'
+[Unit]
+Description=bustd OOM killer
+
+[Service]
+ExecStart=/usr/local/bin/bustd -n
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+sudo systemctl daemon-reload
+sudo systemctl enable --now bustd
 
 echo "Done. Rebooting your system in 15 seconds"
 sleep 15
